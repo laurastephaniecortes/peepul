@@ -1,0 +1,18 @@
+{
+	"ImportPath": "github.com/laura",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v80",
+	"Packages": [
+		"./"
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/jcelliott/lumber",
+			"Rev": "dd349441af25132d146d7095c6693a15431fc9b1"
+		},
+		{
+			"ImportPath": "github.com/nanobox-io/golang-scribble",
+			"Rev": "336beac0a992ed9abaf4ef8e7042ba7fe3335c06"
+		}
+	]
+}
