@@ -61,7 +61,7 @@ if err := db.Write("people", person.Name, person); err != nil {
 func main() {
   http.HandleFunc("/", getPeople)
   http.HandleFunc("/addperson", addPerson)
-  if err := http.ListenAndServe(":8080", nil); err != nil {
+  if err := http.ListenAndServe(":80", nil); err != nil {
     panic(err)
   }
 }
