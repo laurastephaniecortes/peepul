@@ -61,7 +61,13 @@ if err := db.Write("people", person.Name, person); err != nil {
 func main() {
   http.HandleFunc("/", getPeople)
   http.HandleFunc("/addperson", addPerson)
-  if err := http.ListenAndServe(":8080", nil); err != nil {
+  port := os.Getenv("PORT")
+if port == "" {
+  return "", fmt.Errorf("$PORT not set")
+}
+return ":" + port, nil
+}
+  if err := http.ListenAndServe(":" + port, nil); err != nil {
     panic(err)
   }
 }
