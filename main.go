@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"io/ioutil"
+	"github.com/rs/cors"
 
 	scribble "github.com/nanobox-io/golang-scribble"
 )
@@ -12,9 +14,9 @@ import (
 type Person struct {
 	Name           string
 	BodyType       string
-	Age            int64
-	Sex            bool
-	Attractiveness float64 `validate:"max=1"`
+	Age            string
+	Sex            string
+	Attractiveness string
 }
 
 type Hookup struct {
@@ -23,6 +25,8 @@ type Hookup struct {
 }
 
 func getPeople(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+
 	db, err := scribble.New("peeps.db", nil)
 	if err != nil {
 		fmt.Println("Error", err)
@@ -31,19 +35,27 @@ func getPeople(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Error", err)
 	}
-	for _, record := range records {
+	json.NewEncoder(w).Encode(records)
 
-		w.Write([]byte(string(record)))
-	}
+	// for _, record := range records {
+	// 	json.NewEncoder(w).Encode(w)
+	// 	w.Write([]byte(string(record)))
+
+	// }
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 }
 
 func addPerson(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+
 	person := Person{}
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&person)
-	if err != nil {
-		panic(err)
-	}
+	b, _ := ioutil.ReadAll(r.Body)
+	fmt.Println(string(b))
+
+	json.Unmarshal(b, &person) 
+
 
 	db, err := scribble.New("peeps.db", nil)
 	if err != nil {
@@ -53,17 +65,24 @@ func addPerson(w http.ResponseWriter, r *http.Request) {
 	if err := db.Write("people", person.Name, person); err != nil {
 		fmt.Println("Error", err)
 	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 }
 
 func main() {
-	http.HandleFunc("/", getPeople)
-	http.HandleFunc("/addperson", addPerson)
+	r := http.NewServeMux()
+	r.HandleFunc("/", getPeople)
+	r.HandleFunc("/addperson", addPerson)
 	port := os.Getenv("PORT")
 	if port == "" {
-		return
+		port = "8081"
 	}
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"}, // All origins
+		AllowedMethods: []string{"GET", "POST"}, // Allowing only get, just an example
+	})
+  
+	if err := http.ListenAndServe(":"+port,  c.Handler(r)); err != nil {
 		panic(err)
 	}
 }

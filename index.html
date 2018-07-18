@@ -1,7 +1,82 @@
 <html>
 <head><title>test</title></head>
+<script
+src="https://code.jquery.com/jquery-2.2.4.min.js"
+integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+crossorigin="anonymous">
+$(document).ready(function() {
+    $('.form-group input').keypress(function(e) {
+        if (e.which === 13) { //search triggers when Enter key is pressed in the textbox
+            $.ajax({
+                'url': 'http://apis.is/car',
+                'type': 'GET',
+                'dataType': 'json',
+                'data': { 'number': $('.form-group input').val() },
+                'success': function(response) {
+                    if (response.results) {
+                        var html = '';
+                        for (var i = 0; i < response.results.length; i++) {
+                            html += '<table><thead class="thead-default"> <tr> <th>Reitur</th> <th>Gildi</th> </tr> </thead>';
+                            html += '<tr><td>Tegund</td><td>' + response.results[i].type + '</td></tr>';
+                            html += '<tr><td>Undirgerð</td><td>' + response.results[i].subType + '</td></tr>';
+                            html += '<tr><td>Litur</td><td>' + response.results[i].color + '</td></tr>';
+                            html += '<tr><td>Verksmiðjunúmer</td><td>' + response.results[i].factoryNumber + '</td></tr>';
+                            html += '<tr><td>Skráður</td><td>' + response.results[i].registeredAt + '</td></tr>';
+                            html += '<tr><td>Mengun</td><td>' + response.results[i].pollution + '</td></tr>';
+                            html += '<tr><td>Þyngd</td><td>' + response.results[i].weight + '</td></tr>';
+                            html += '<tr><td>Skoðunarstaða</td><td>' + response.results[i].status + '</td></tr>';
+                            html += '<tr><td>Næsta skoðun</td><td>' + response.results[i].nextCheck + '</td></tr>';
+                            html += '</table><p>&nbsp</p>';
+                        }
+                        $('#results').html(html);
+
+                    }
+                }
+            });
+        }
+    });
+});
+
+</script>
+<script type="text/javascript" >
+function Send() { 
+    var form = document.getElementById("form");
+
+    
+    
+    form.onclick = function (e) {
+      // stop the regular form submission
+      e.preventDefault();
+    
+      // collect the form data while iterating over the inputs
+      var data = {};
+      for (var i = 0, ii = form.length; i < ii; ++i) {
+        var input = form[i];
+        if (input.name) {
+          data[input.name] = input.value;
+        }
+      }
+    
+      // construct an HTTP request
+      var xhr = new XMLHttpRequest();
+
+      xhr.open("post", "http://127.0.0.1:8081/addperson", true);
+      xhr.setRequestHeader('Content-Type', 'application/json', 'charset=UTF-8');
+
+      // send the collected data as JSON
+      console.log(JSON.stringify(data))
+      xhr.send(JSON.stringify(data));
+    
+      xhr.onloadend = function () {
+        // done
+      };
+    };
+};
+    </script>
+
 <body>
-    <form action="myurl" method="POST" name="myForm">
+
+    <form  id="form"  enctype="application/json" >
         <p><label for="Name">Name:</label>
         <input type="text" name="Name" id="Name"></p>
 
@@ -17,6 +92,6 @@
         <p><label for="Attractiveness">Attractiveness:</label>
         <input type="number" name="Attractiveness" id="Attractiveness"></p>
 
-        <input value="Submit" type="submit" onclick="submitform()">
+        <input value="submit" type="submit" onclick="Send()" >
     </form>
 </body>
